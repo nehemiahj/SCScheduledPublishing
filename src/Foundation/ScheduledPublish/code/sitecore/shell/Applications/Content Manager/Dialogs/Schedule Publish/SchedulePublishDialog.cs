@@ -30,6 +30,7 @@ using Constants = ScheduledPublish.Utils.Constants;
 using Control = Sitecore.Web.UI.HtmlControls.Control;
 using ItemList = Sitecore.Collections.ItemList;
 using Action = Sitecore.Web.UI.HtmlControls.Action;
+using Sitecore.Workflows;
 
 namespace ScheduledPublish.sitecore.shell.Applications.Content_Manager.Dialogs.Schedule_Publish
 {
@@ -41,7 +42,9 @@ namespace ScheduledPublish.sitecore.shell.Applications.Content_Manager.Dialogs.S
         protected Groupbox ScheduleSettings;
         protected Groupbox ScheduleLanguages;
         protected Groupbox ScheduleTargets;
+        protected Groupbox GrpWorkflowState;
         protected Border ExistingSchedules;
+        protected Literal LtrItemWorkflowState;
         protected GridPanel GridRecurrence;
         protected Border Languages;
         protected Border PublishModePanel;
@@ -238,6 +241,7 @@ namespace ScheduledPublish.sitecore.shell.Applications.Content_Manager.Dialogs.S
                 BuildExistingSchedules();
                 BuildPublishingTargets();
                 BuildLanguages();
+                BuildItemWorkflowStateStatus();
                 PublishDateTimePicker.Value = DateUtil.ToIsoDate(DateTime.Now.AddMinutes(2));
 
                 ServerTime.Text = Constants.CURREN_TIME_ON_SERVER_TEXT + DateTime.Now.ToString(_culture);
@@ -445,6 +449,36 @@ namespace ScheduledPublish.sitecore.shell.Applications.Content_Manager.Dialogs.S
             ExistingSchedules.InnerHtml = string.IsNullOrWhiteSpace(schedulesHtml)
                 ? Constants.NO_EXISTING_SCHEDULES_TEXT
                 : schedulesHtml;
+        }
+
+        /// <summary>
+        /// Displays a status of the item workflow state. If not in final state, there will be warning. 
+        /// </summary>
+        private void BuildItemWorkflowStateStatus()
+        {
+            WorkflowState currentState;
+            if (InnerItem != null)
+            {
+                IWorkflow itemWorkflow = _database.WorkflowProvider.GetWorkflow(InnerItem);
+                if (itemWorkflow != null)
+                {
+                    currentState = itemWorkflow.GetState(InnerItem);
+                    if (currentState != null && currentState.FinalState)
+                    {
+                        LtrItemWorkflowState.Text = Constants.ITEM_IN_FINAL_STATE_TEXT;
+                        LtrItemWorkflowState.Style.Add("color", "green");
+                    }
+                    else
+                    {
+                        LtrItemWorkflowState.Text = Constants.ITEM_NOT_IN_FINAL_STATE_TEXT;
+                        LtrItemWorkflowState.Style.Add("color", "red");
+                    }
+                }
+                else
+                {
+                    GrpWorkflowState.Visible = false;
+                }
+            }
         }
 
         /// <summary>

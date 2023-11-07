@@ -18,6 +18,8 @@ namespace ScheduledPublish.Utils
         public const string CURREN_TIME_ON_SERVER_TEXT = "Current time on server: ";
         public const string NO_VALID_VERSION_TEXT = "no valid version";
         public const string NO_EXISTING_SCHEDULES_TEXT = "This item has not been scheduled for publishing yet.";
+        public const string ITEM_NOT_IN_FINAL_STATE_TEXT = "Warning! This item is not in the final workflow step.";
+        public const string ITEM_IN_FINAL_STATE_TEXT = "This item is in final workflow step.";
         public const string SCHEDULED_PUBLISH_NOTIFICATION = "This item has been scheduled for publish.";
         public const string SCHEDULED_PUBLISH_ICON = "People/16x16/clock_run.png";
         #endregion
