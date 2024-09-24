@@ -3,7 +3,7 @@
     <metadata>
       <PackageName>Sitecore Schedule Publish</PackageName>
       <Author>Nehemiah Jeyakumar</Author>
-      <Version>10.3 IAR</Version>
+      <Version>10.4</Version>
       <Revision />
       <License />
       <Comment>This version uses Items as resource files instead of adding Sitecore items</Comment>

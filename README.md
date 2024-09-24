@@ -1,42 +1,59 @@
+forked from [HedgehogDevelopment/SCScheduledPublishing](https://github.com/HedgehogDevelopment/SCScheduledPublishing).
 
-forked from [HedgehogDevelopment/SCScheduledPublishing](https://github.com/HedgehogDevelopment/SCScheduledPublishing). 
+[Documentation](https://github.com/HedgehogDevelopment/SCScheduledPublishing/tree/master/Documentation) has been updated in the readme markdown.
 
-[Documentation](https://github.com/HedgehogDevelopment/SCScheduledPublishing/tree/master/Documentation) has been updated in the readme markdown. 
-# Overview: # 
+# Overview:
+
 The purpose of Scheduled Publish is to give the content editor the option to delay the publishing of an item for a future point in time. Thus, a page or a feature that should go live at a specific time can be created and populated in Sitecore and previewed long before it goes live without the risk of an accidental publish before the specific time. Moreover, there is no need for a content-editor to go to Sitecore and manually publish something at an inconvenient hour, e.g. a New Year’s announcement. Scheduled Publish intends to give the content-editor all features of a normal publish with the addition of automation, timing and notifications.
-## Source: ##
- - [Source](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/src/Foundation/ScheduledPublish) is updated to Sitecore 10.3.0.   
- - [Sitecore Content Serialization](https://doc.sitecore.com/xp/en/developers/102/developer-tools/sitecore-content-serialization.html) is used to serialize the content. You can use Sitecore CLI to Push and Pull the content. 
-## Setup: ##
- 1. Package is compatible for Sitecore v10+. You can download it from [here](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages). 
- 2. You can take the source and add it to your solution. 
- 3. Use the Docker Image from [here](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish). ```docker pull nehemiah/sitecore-scheduled-publish```
-## Features: ##
- - Scheduled Publish
- - Scheduled Unpublish
- - Edit publish schedule
- - Date and time can be customized
- - Warning if the content-editor selects a date that has already passed
- - Check if the item is in a valid publishing state
- - Check if the item’s publishing restrictions allow publishing according to the desired schedule
- - Target database to which to publish
- - Language versions which to publish
- - Publish modes
- - Publish Children
- - Frequency of checks whether there are items queued for publishing
- - Simple interface
- - Customizable email notifications 
-## Guide: ##
+
+## Source:
+
+- [Source](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/src/Foundation/ScheduledPublish) is updated to Sitecore 10.4.
+- [Sitecore Content Serialization](https://doc.sitecore.com/xp/en/developers/102/developer-tools/sitecore-content-serialization.html) is used to serialize the content. Use Sitecore CLI to Push and Pull the content.
+
+## Setup:
+
+1.  Package is compatible for Sitecore v10+. [Download Package](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages).
+2.  Clone source and add it in solution.
+3.  Use Docker Image from [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish).
+    - `nehemiah/sitecore-scheduled-publish:latest` - v10.4 & IAR
+    - `nehemiah/sitecore-scheduled-publish:10.4-1809` - v10.4 & IAR
+    - `nehemiah/sitecore-scheduled-publish:10.3-1809` - v10.3
+    - `nehemiah/sitecore-scheduled-publish:10.2-1809` - v10.2
+    - more...
+
+## Features:
+
+- Scheduled Publish
+- Scheduled Unpublish
+- Edit publish schedule
+- Date and time can be customized
+- Warning if the content-editor selects a date that has already passed
+- Check if the item is in a valid publishing state
+- Check if the item’s publishing restrictions allow publishing according to the desired schedule
+- Target database to which to publish
+- Language versions which to publish
+- Publish modes
+- Publish Children
+- Frequency of checks whether there are items queued for publishing
+- Simple interface
+- Customizable email notifications
+
+## Guide:
+
 This is how the Scheduled Publish strip in the Publish Ribbon:
 
 ![enter image description here](https://raw.githubusercontent.com/nehemiahj/images/main/Publish%201.PNG)
 
 Content-editors can still use the well-known Publish button for all publish methods they are used to. The Schedule Publish button is what is used only for scheduling a future publish.
 The Schedule Publish strip consists of three buttons:
- - Schedule Publish button for scheduling a future publishing of the current item
- - Schedule Unpublish button for scheduling a future unpublishing of the current item
- - Edit Schedule button where the content editor can review, edit and delete any of the existing schedules for any items.
-## Schedule Publish: ##
+
+- Schedule Publish button for scheduling a future publishing of the current item
+- Schedule Unpublish button for scheduling a future unpublishing of the current item
+- Edit Schedule button where the content editor can review, edit and delete any of the existing schedules for any items.
+
+## Schedule Publish:
+
 This is how the Scheduled Publish dialog looks like:
 
 ![enter image description here](https://raw.githubusercontent.com/nehemiahj/images/main/Publish%202.PNG)
@@ -60,10 +77,12 @@ If there are already scheduled publishes for the particular item, a list of thes
 
 ![enter image description here](https://raw.githubusercontent.com/nehemiahj/images/main/Publish%205.PNG)
 
-## Schedule Unpublish: ##
+## Schedule Unpublish:
+
 The Schedule Unpublish dialog is identical to the Schedule Publish one, only it will remove an item from the website at the selected time.
 
-## Edit Publish: ##
+## Edit Publish:
+
 The Edit Schedule button will pop the Edit Scheduled Publishing dialog.
 
 Note: this dialog will list all scheduled publishes by date, not just the scheduled publishes for the currently selected item.
@@ -78,7 +97,8 @@ The third column – Date – first shows the current date and time of the sched
 
 The fourth column – Delete – consists of a checkbox. Checking that checkbox will delete the selected schedule upon hitting ‘OK’.
 
-## Publish Notification: ##
+## Publish Notification:
+
 Scheduled Publish can be customized to send a notification to the content editor who assigned it and other users when a publish takes place. The email settings can be found under Sitecore/System/Modules/Scheduled Publish.
 The Settings item contains a checkbox whether email notifications should be sent upon publish.
 
@@ -92,7 +112,8 @@ If notification is enabled, the content-editor who assigned scheduled publish on
 
 The name of the published item can be added to the Subject of the received email using the “[item]” placeholder for it.
 
-## Email Tokens: ##
+## Email Tokens:
+
 There are several placeholders available in the Message field as well so the mail message’s body is very flexible. It can contain anything the content-editor inputs, plus allows the following replacements:
 
 [id] - the id of the item being published
@@ -106,3 +127,18 @@ There are several placeholders available in the Message field as well so the mai
 [time] - the time when the publishing took place
 
 [version] - the version of the item which was published
+
+## Job Interval Configuration:
+
+This module utilizes a scheduled task in the master database to manage content publishing. This task processes pending publish requests at regular intervals, defined by both global scheduling frequency and individual settings at the master database agent level. To ensure optimal performance, carefully consider the impact of increasing the frequency, as it can add load to the Content Management (CM) instance.
+
+```xml
+<scheduling>
+	<!--  Time between checking for scheduled tasks waiting to execute  -->
+	<!-- SCHEDULAR GLOBAL INTERVAL TIME -->
+	<frequency>00:00:05</frequency>
+	<!--  An agent that processes scheduled tasks embedded as items in the master database.  -->
+	<!-- SCHEDULAR MASTER DB INTERVAL TIME -->
+	<agent name="Master_Database_Agent" type="Sitecore.Tasks.DatabaseAgent" method="Run" interval="00:10:00" />
+</scheduling>
+```
