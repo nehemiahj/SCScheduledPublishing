@@ -3,7 +3,7 @@
     <metadata>
       <PackageName>Sitecore Schedule Publish</PackageName>
       <Author>Nehemiah Jeyakumar</Author>
-      <Version>10.2</Version>
+      <Version>10.4</Version>
       <Revision />
       <License />
       <Comment />
@@ -90,7 +90,16 @@
       <SkipVersions>False</SkipVersions>
       <Converter>
         <ItemToEntryConverter>
-          <Transforms />
+          <Transforms>
+            <InstallerConfigurationTransform>
+              <Options>
+                <BehaviourOptions>
+                  <ItemMode>Undefined</ItemMode>
+                  <ItemMergeMode>Undefined</ItemMergeMode>
+                </BehaviourOptions>
+              </Options>
+            </InstallerConfigurationTransform>
+          </Transforms>
         </ItemToEntryConverter>
       </Converter>
       <Include />
