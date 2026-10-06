@@ -40,7 +40,7 @@ The image contains CM content only. The module is used from the Content Editor, 
 
 ## What's inside
 
-```
+```text
 \module\cm\content\
   bin\ScheduledPublish.dll
   App_Config\Include\ZZ_ScheduledPublish\ZZ_ScheduledPublishControl.config
@@ -52,7 +52,12 @@ The image contains CM content only. The module is used from the Content Editor, 
 
 From 10.4 onward, the module's items (templates, settings, the scheduled task, and the core ribbon, gutter and field types) ship as **Items as Resources (IAR)** `.dat` files. Copying the files is the whole installation: there's no package to install and no database step. This also works on Sitecore 10.5, where Package Designer is disabled.
 
-**Upgrading** an environment where the module was once installed with the Installation Wizard: the database copies of the items take precedence over the IAR files. Remove them once with `dotnet sitecore itemres cleanup`. See the [upgrade notes](https://github.com/nehemiahj/SCScheduledPublishing#sitecore-105).
+**Upgrading.** A database copy of an item takes precedence over its IAR version.
+
+- **Fresh install, or upgrade from a 10.4 / 10.4.1 IAR image:** no cleanup is needed.
+- **Upgrade from an Installation Wizard or `ser push` install:** run `dotnet sitecore itemres cleanup --what-if`, then `dotnet sitecore itemres cleanup`. Force-remove only the module definitions (templates, ribbon, field type).
+
+Keep the database copies of `ScheduledPublishTask`, which Sitecore recreates on every run, and of any module settings you customized. Never use `--force` on `/sitecore/system/Modules/Scheduled Publish`. See the [upgrade notes](https://github.com/nehemiahj/SCScheduledPublishing#sitecore-105).
 
 ## Verify
 
@@ -63,7 +68,7 @@ From 10.4 onward, the module's items (templates, settings, the scheduled task, a
 
 10.5 images include OCI labels with the version, the source commit and the build date:
 
-```
+```text
 docker inspect nehemiah/sitecore-scheduled-publish:10.5-ltsc2022 --format "{{json .Config.Labels}}"
 ```
 
