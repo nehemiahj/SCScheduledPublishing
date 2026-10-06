@@ -95,20 +95,25 @@ try {
 
     $images = @()
     if ($DockerRepository) {
-        # 10.5.0 -> 10.5, 10.5.1 -> 10.5.1 (matches the existing 10.4-ltsc2022 style tags)
-        $imageVersion = $Version -replace '\.0$', ''
+        # Version = <Sitecore version>[.<module revision>], e.g. 10.5.0 or 10.5.0.1.
+        # Floating tag per Sitecore version (10.5.0 -> 10.5, 10.4.1 -> 10.4.1, matching the existing
+        # 10.4-ltsc2022 style); a revision build also gets an exact tag (10.5.0.1-ltsc2025).
+        $parts = $Version.Split('.')
+        $sitecoreVersion = ($parts[0..2] -join '.') -replace '\.0$', ''
         $revision = (git -C $repoRoot rev-parse HEAD).Trim()
         $created = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
         foreach ($base in $DockerBases) {
-            $image = "$($DockerRepository.ToLower()):$imageVersion-$base"
-            Write-Host "== Building Docker image $image" -ForegroundColor Cyan
-            Invoke-Native docker @("build",
+            $image = "$($DockerRepository.ToLower()):$sitecoreVersion-$base"
+            $tags = @("-t", $image)
+            if ($parts.Count -gt 3) { $tags += @("-t", "$($DockerRepository.ToLower()):$Version-$base") }
+            Write-Host "== Building Docker image $($tags | Where-Object { $_ -ne '-t' })" -ForegroundColor Cyan
+            Invoke-Native docker (@("build",
                 "--build-arg", "BASE_IMAGE=mcr.microsoft.com/windows/nanoserver:$base",
                 "--build-arg", "VERSION=$Version",
                 "--build-arg", "REVISION=$revision",
                 "--build-arg", "CREATED=$created",
-                "-f", (Join-Path $repoRoot "docker\Dockerfile"), "-t", $image, $dockerContext)
-            $images += $image
+                "-f", (Join-Path $repoRoot "docker\Dockerfile")) + $tags + @($dockerContext))
+            $images += $tags | Where-Object { $_ -ne "-t" }
         }
     }
 
