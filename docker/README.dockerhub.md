@@ -8,8 +8,8 @@ This is a **Sitecore module asset image**. You don't run it. You copy its files 
 
 | Tag | Sitecore | Windows base | Items |
 | --- | --- | --- | --- |
+| `10.5-ltsc2025` | 10.5 | Server 2025 (`ltsc2025`) | IAR |
 | `10.5-ltsc2022`, `latest` | 10.5 | Server 2022 (`ltsc2022`) | IAR |
-| `10.5-1809` | 10.5 | Server 2019 (`1809`) | IAR |
 | `10.4.1-ltsc2022` | 10.4.1 | Server 2022 (`ltsc2022`) | IAR |
 | `10.4.1-1809` | 10.4.1 | Server 2019 (`1809`) | IAR |
 | `10.4-ltsc2022` | 10.4 | Server 2022 (`ltsc2022`) | IAR |
@@ -17,7 +17,7 @@ This is a **Sitecore module asset image**. You don't run it. You copy its files 
 | `10.3-1809` | 10.3 | Server 2019 (`1809`) | |
 | `10.2-1809` | 10.2 | Server 2019 (`1809`) | |
 
-Pick the tag that matches your Sitecore version and the Windows base of your CM image.
+Pick the tag that matches your Sitecore version and the Windows base of your CM image. Windows Server 2025 containers are supported from Sitecore 10.5, and Sitecore 10.5 no longer supports Windows Server 2019 (`1809` / `ltsc2019`), so there is no 10.5 `1809` image.
 
 ## Usage
 
