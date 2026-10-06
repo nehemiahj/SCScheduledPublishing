@@ -96,10 +96,16 @@ try {
     if ($DockerRepository) {
         # 10.5.0 -> 10.5, 10.5.1 -> 10.5.1 (matches the existing 10.4-1809 style tags)
         $imageVersion = $Version -replace '\.0$', ''
+        $revision = (git -C $repoRoot rev-parse HEAD).Trim()
+        $created = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
         foreach ($base in $DockerBases) {
             $image = "$($DockerRepository.ToLower()):$imageVersion-$base"
             Write-Host "== Building Docker image $image" -ForegroundColor Cyan
-            Invoke-Native docker @("build", "--build-arg", "BASE_IMAGE=mcr.microsoft.com/windows/nanoserver:$base",
+            Invoke-Native docker @("build",
+                "--build-arg", "BASE_IMAGE=mcr.microsoft.com/windows/nanoserver:$base",
+                "--build-arg", "VERSION=$Version",
+                "--build-arg", "REVISION=$revision",
+                "--build-arg", "CREATED=$created",
                 "-f", (Join-Path $repoRoot "docker\Dockerfile"), "-t", $image, $dockerContext)
             $images += $image
         }
