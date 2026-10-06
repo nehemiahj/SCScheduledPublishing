@@ -49,7 +49,22 @@ Pick one of the following:
     ```
 
     Recycle the app pool (or restart the container) afterwards.
-3.  **Docker image**: `nehemiah/sitecore-scheduled-publish:<10.5 tag>`. *Details to follow.*
+3.  **Docker image**. A Sitecore module asset image (CM only) is available on [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish):
+    - `nehemiah/sitecore-scheduled-publish:10.5-ltsc2022`: Windows Server 2022 base
+    - `nehemiah/sitecore-scheduled-publish:10.5-1809`: Windows Server 2019 base
+
+    The image contains the module files under `\module\cm\content`. Copy them into your CM image:
+
+    ```dockerfile
+    ARG BASE_IMAGE
+    ARG SCHEDULED_PUBLISH_IMAGE=nehemiah/sitecore-scheduled-publish:10.5-ltsc2022
+
+    FROM ${SCHEDULED_PUBLISH_IMAGE} AS scheduledpublish
+
+    FROM ${BASE_IMAGE}
+    ...
+    COPY --from=scheduledpublish \module\cm\content .\
+    ```
 4.  **From source**. Clone the repo and add the project to your solution. Deploy the files, then either:
     - push the items to the database with the Sitecore CLI: `dotnet sitecore ser push -i ScheduledPublish`, or
     - generate the IAR files: `dotnet sitecore itemres create -i ScheduledPublish -o <webroot>/App_Data/items/schedule.publish`, then move each `items.<db>.schedule.publish.dat` into `App_Data/items/<db>/`.
@@ -88,6 +103,16 @@ pwsh ./scripts/Build-Package.ps1 -Version 10.5.0
 ```
 
 The script generates the IAR files with `dotnet sitecore itemres create`, builds the DLL, and writes the file-drop zip and the `.nupkg` to `artifacts/`. It also copies the zip to `Packages/`. Package Designer isn't used.
+
+To also build the Docker module asset images, run on Windows with Docker in Windows-container mode:
+
+```
+pwsh ./scripts/Build-Package.ps1 -Version 10.5.0 -DockerRepository nehemiah/sitecore-scheduled-publish
+docker push nehemiah/sitecore-scheduled-publish:10.5-ltsc2022
+docker push nehemiah/sitecore-scheduled-publish:10.5-1809
+```
+
+This builds one image per base in `-DockerBases` (default `ltsc2022`, `1809`) from `docker/Dockerfile`, tagged `<version>-<base>`. The images contain `\module\cm\content`, the same files as the zip. The [docker asset image creator](https://github.com/KayeeNL/sitecore-module-docker-asset-image-creator) isn't needed for 10.5: it converts Installation Wizard packages, and the 10.5 release is already plain files.
 
 Pushing a `Sitecore_10.5*` tag runs `.github/workflows/release.yml`. That workflow builds the same artifacts, attaches them to a GitHub release, and publishes the NuGet package to nuget.org with [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing), so no API key is stored in the repo.
 

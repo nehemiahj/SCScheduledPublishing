@@ -7,16 +7,26 @@
     2. Builds ScheduledPublish.dll.
     3. Lays out the webroot files and zips them (file-drop package; unzip into the webroot to install).
     4. Packs the NuGet package.
+    5. Lays out the Sitecore module asset image (module\cm\content) and, with -DockerRepository,
+       builds one image per Windows base (docker/Dockerfile). Pushing is left to the caller.
 
     Output goes to <repo>\artifacts. The file-drop zip is also copied to <repo>\Packages.
 
 .EXAMPLE
     pwsh ./scripts/Build-Package.ps1
+
+.EXAMPLE
+    # Also builds nehemiah/sitecore-scheduled-publish:10.5-ltsc2022 and :10.5-1809
+    pwsh ./scripts/Build-Package.ps1 -DockerRepository nehemiah/sitecore-scheduled-publish
 #>
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
-    [string]$Version = "10.5.0"
+    [string]$Version = "10.5.0",
+    # Docker repository to build the module asset images into. No images are built when empty.
+    [string]$DockerRepository,
+    # Windows nanoserver base tags; one image is built per base, tagged <version>-<base>.
+    [string[]]$DockerBases = @("ltsc2022", "1809")
 )
 
 $ErrorActionPreference = "Stop"
@@ -76,8 +86,31 @@ try {
     Write-Host "== Packing NuGet package" -ForegroundColor Cyan
     Invoke-Native dotnet @("pack", $project, "-c", $Configuration, "--no-build", "-o", $artifacts, "-p:Version=$Version", "-p:IarOutputPath=$iarDir\")
 
+    Write-Host "== Laying out Docker module asset image (CM)" -ForegroundColor Cyan
+    $dockerContext = Join-Path $artifacts "docker"
+    $cmContent = Join-Path $dockerContext "module\cm\content"
+    New-Item -ItemType Directory -Force $cmContent | Out-Null
+    Copy-Item (Join-Path $webroot "*") $cmContent -Recurse
+
+    $images = @()
+    if ($DockerRepository) {
+        # 10.5.0 -> 10.5, 10.5.1 -> 10.5.1 (matches the existing 10.4-1809 style tags)
+        $imageVersion = $Version -replace '\.0$', ''
+        foreach ($base in $DockerBases) {
+            $image = "$($DockerRepository.ToLower()):$imageVersion-$base"
+            Write-Host "== Building Docker image $image" -ForegroundColor Cyan
+            Invoke-Native docker @("build", "--build-arg", "BASE_IMAGE=mcr.microsoft.com/windows/nanoserver:$base",
+                "-f", (Join-Path $repoRoot "docker\Dockerfile"), "-t", $image, $dockerContext)
+            $images += $image
+        }
+    }
+
     Write-Host "`nArtifacts:" -ForegroundColor Green
     Get-ChildItem $artifacts -File | ForEach-Object { Write-Host "  $($_.FullName)" }
+    if ($images) {
+        Write-Host "`nDocker images (push with: docker push <image>):" -ForegroundColor Green
+        $images | ForEach-Object { Write-Host "  $_" }
+    }
 }
 finally {
     Pop-Location
