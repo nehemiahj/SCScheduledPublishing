@@ -91,10 +91,12 @@ Run the second command for each root path in `ScheduledPublish.module.json`. Wit
 1.  Install the package for your version from [Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages) with the Installation Wizard. From 10.3 onward, an IAR variant is available.
 2.  Clone source and add it in solution.
 3.  Use Docker Image from [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish).
+    - `nehemiah/sitecore-scheduled-publish:10.4.1-ltsc2022` - v10.4.1 & IAR
+    - `nehemiah/sitecore-scheduled-publish:10.4.1-1809` - v10.4.1 & IAR
+    - `nehemiah/sitecore-scheduled-publish:10.4-ltsc2022` - v10.4 & IAR
     - `nehemiah/sitecore-scheduled-publish:10.4-1809` - v10.4 & IAR
     - `nehemiah/sitecore-scheduled-publish:10.3-1809` - v10.3
     - `nehemiah/sitecore-scheduled-publish:10.2-1809` - v10.2
-    - more...
 
 ### Building the release (maintainers)
 
@@ -112,7 +114,7 @@ docker push nehemiah/sitecore-scheduled-publish:10.5-ltsc2022
 docker push nehemiah/sitecore-scheduled-publish:10.5-1809
 ```
 
-This builds one image per base in `-DockerBases` (default `ltsc2022`, `1809`) from `docker/Dockerfile`, tagged `<version>-<base>`. The images contain `\module\cm\content`, the same files as the zip. The [docker asset image creator](https://github.com/KayeeNL/sitecore-module-docker-asset-image-creator) isn't needed for 10.5: it converts Installation Wizard packages, and the 10.5 release is already plain files.
+This builds one image per base in `-DockerBases` (default `ltsc2022`, `1809`) from `docker/Dockerfile`, tagged `<version>-<base>`. The images carry OCI labels for version, source commit, build date and license. The Docker Hub overview is kept in `docker/README.dockerhub.md`; paste it into the repository's Overview on Docker Hub when tags change. The images contain `\module\cm\content`, the same files as the zip. The [docker asset image creator](https://github.com/KayeeNL/sitecore-module-docker-asset-image-creator) isn't needed for 10.5: it converts Installation Wizard packages, and the 10.5 release is already plain files.
 
 Pushing a `Sitecore_10.5*` tag runs `.github/workflows/release.yml`. That workflow builds the same artifacts, attaches them to a GitHub release, and publishes the NuGet package to nuget.org with [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing), so no API key is stored in the repo.
 
