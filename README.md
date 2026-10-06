@@ -50,9 +50,11 @@ Pick one of the following:
 
     Recycle the app pool (or restart the container) afterwards.
 3.  **Docker image**. A Sitecore module asset image (CM only) is available on [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish):
+    - `nehemiah/sitecore-scheduled-publish:10.5-ltsc2025`: Windows Server 2025 base (supported from Sitecore 10.5)
     - `nehemiah/sitecore-scheduled-publish:10.5-ltsc2022`: Windows Server 2022 base
-    - `nehemiah/sitecore-scheduled-publish:10.5-1809`: Windows Server 2019 base
     - `nehemiah/sitecore-scheduled-publish:latest`: same as `10.5-ltsc2022`
+
+    Sitecore 10.5 no longer supports Windows Server 2019 (1809 / ltsc2019) containers, so there is no 10.5 `1809` image.
 
     The image contains the module files under `\module\cm\content`. Copy them into your CM image:
 
@@ -110,11 +112,11 @@ To also build the Docker module asset images, run on Windows with Docker in Wind
 
 ```
 pwsh ./scripts/Build-Package.ps1 -Version 10.5.0 -DockerRepository nehemiah/sitecore-scheduled-publish
+docker push nehemiah/sitecore-scheduled-publish:10.5-ltsc2025
 docker push nehemiah/sitecore-scheduled-publish:10.5-ltsc2022
-docker push nehemiah/sitecore-scheduled-publish:10.5-1809
 ```
 
-This builds one image per base in `-DockerBases` (default `ltsc2022`, `1809`) from `docker/Dockerfile`, tagged `<version>-<base>`. The images carry OCI labels for version, source commit, build date and license. The Docker Hub overview is kept in `docker/README.dockerhub.md`; paste it into the repository's Overview on Docker Hub when tags change. The images contain `\module\cm\content`, the same files as the zip. The [docker asset image creator](https://github.com/KayeeNL/sitecore-module-docker-asset-image-creator) isn't needed for 10.5: it converts Installation Wizard packages, and the 10.5 release is already plain files.
+This builds one image per base in `-DockerBases` (default `ltsc2025`, `ltsc2022`) from `docker/Dockerfile`, tagged `<version>-<base>`. The images carry OCI labels for version, source commit, build date and license. The Docker Hub overview is kept in `docker/README.dockerhub.md`; paste it into the repository's Overview on Docker Hub when tags change. The images contain `\module\cm\content`, the same files as the zip. The [docker asset image creator](https://github.com/KayeeNL/sitecore-module-docker-asset-image-creator) isn't needed for 10.5: it converts Installation Wizard packages, and the 10.5 release is already plain files.
 
 Pushing a `Sitecore_10.5*` tag runs `.github/workflows/release.yml`. That workflow builds the same artifacts, attaches them to a GitHub release, and publishes the NuGet package to nuget.org with [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing), so no API key is stored in the repo.
 

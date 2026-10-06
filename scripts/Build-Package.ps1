@@ -16,7 +16,7 @@
     pwsh ./scripts/Build-Package.ps1
 
 .EXAMPLE
-    # Also builds nehemiah/sitecore-scheduled-publish:10.5-ltsc2022 and :10.5-1809
+    # Also builds nehemiah/sitecore-scheduled-publish:10.5-ltsc2025 and :10.5-ltsc2022
     pwsh ./scripts/Build-Package.ps1 -DockerRepository nehemiah/sitecore-scheduled-publish
 #>
 [CmdletBinding()]
@@ -26,7 +26,8 @@ param(
     # Docker repository to build the module asset images into. No images are built when empty.
     [string]$DockerRepository,
     # Windows nanoserver base tags; one image is built per base, tagged <version>-<base>.
-    [string[]]$DockerBases = @("ltsc2022", "1809")
+    # Sitecore 10.5 supports ltsc2025 and ltsc2022; 1809/ltsc2019 is no longer supported.
+    [string[]]$DockerBases = @("ltsc2025", "ltsc2022")
 )
 
 $ErrorActionPreference = "Stop"
@@ -94,7 +95,7 @@ try {
 
     $images = @()
     if ($DockerRepository) {
-        # 10.5.0 -> 10.5, 10.5.1 -> 10.5.1 (matches the existing 10.4-1809 style tags)
+        # 10.5.0 -> 10.5, 10.5.1 -> 10.5.1 (matches the existing 10.4-ltsc2022 style tags)
         $imageVersion = $Version -replace '\.0$', ''
         $revision = (git -C $repoRoot rev-parse HEAD).Trim()
         $created = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
