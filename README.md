@@ -20,8 +20,23 @@ The purpose of Scheduled Publish is to give the content editor the option to del
 
 ## Source:
 
-- [Source](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/src/Foundation/ScheduledPublish) is updated to Sitecore 10.5.
-- [Sitecore Content Serialization](https://doc.sitecore.com/xp/en/developers/102/developer-tools/sitecore-content-serialization.html) is used to serialize the content. Use Sitecore CLI to Push and Pull the content.
+The [source](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/src/Foundation/ScheduledPublish) targets **Sitecore 10.5** (.NET Framework 4.8.1, `Sitecore.Kernel` 10.5.0).
+
+| Path | Contents |
+| --- | --- |
+| `src/Foundation/ScheduledPublish/code` | Module code (`ScheduledPublish.csproj`), config, dialog XMLs, NuGet build targets |
+| `src/Foundation/ScheduledPublish/serialization` | Module items as [Sitecore Content Serialization](https://doc.sitecore.com/xp/en/developers/latest/developer-tools/sitecore-content-serialization.html) (SCS) YAML: templates, settings, task, core ribbon/gutter/field type |
+| `ScheduledPublish.module.json`, `sitecore.json` | SCS module definition and [Sitecore CLI](https://doc.sitecore.com/xp/en/developers/latest/developer-tools/sitecore-command-line-interface.html) configuration (CLI 5.2.113 in `.config/dotnet-tools.json`) |
+| `scripts/Build-Package.ps1` | Builds the release: IAR files, DLL, zip, NuGet package, Docker images |
+| `docker/` | Dockerfile and Docker Hub overview for the module asset images |
+
+**Prerequisites:** .NET SDK (8 or later), the .NET Framework 4.8.1 targeting pack, and access to the Sitecore NuGet feed. The feed is configured in `NuGet.config`. For Docker images, you also need Docker in Windows-container mode.
+
+**Serialized items.** The items in `serialization/` are the source of truth for the module's items:
+- **Development:** push them to a local instance with `dotnet sitecore ser push -i ScheduledPublish`, and pull changes back with `dotnet sitecore ser pull -i ScheduledPublish`.
+- **Releases:** don't push items. The same YAML is compiled into Items as Resources files with [`dotnet sitecore itemres create`](https://doc.sitecore.com/xp/en/developers/latest/developer-tools/the-cli-itemres-command.html), which `Build-Package.ps1` does for you.
+
+After changing items, check that the module still loads from IAR on a clean instance. See [Building the release](#building-the-release-maintainers).
 
 ## Setup:
 
@@ -50,8 +65,10 @@ Pick one of the following:
 1.  **NuGet** (recommended for solutions with a CI/CD pipeline). Add the package to your Sitecore web project:
 
     ```
-    dotnet add package SCScheduledPublish --version 10.5.0
+    dotnet add package SCScheduledPublish
     ```
+
+    To stay on the Sitecore 10.5 line and pick up module updates (10.5.0.x), use a floating version in the project file: `<PackageReference Include="SCScheduledPublish" Version="10.5.0.*" />`.
 
     The DLL is referenced as usual. The config, IAR and dialog files are added to the web project's publish output, at the paths listed above. Deploy the web project the way you normally do (Web Deploy, PaaS pipeline, or Docker build).
 2.  **File-drop zip**. Download `Sitecore Schedule Publish-10.5.0 IAR (files).zip` from [Packages](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/Packages) or the GitHub release, and extract it into the CM (and CD) webroot. On Azure PaaS, use Kudu / the zip deploy API. In a Docker image, add it to your CM Dockerfile:
@@ -159,6 +176,24 @@ docker push nehemiah/sitecore-scheduled-publish:10.5-ltsc2022
 ```
 
 This builds one image per base in `-DockerBases` (default `ltsc2025`, `ltsc2022`) from `docker/Dockerfile`, tagged `<version>-<base>`. The images carry OCI labels for version, source commit, build date and license. The Docker Hub overview is kept in `docker/README.dockerhub.md`; paste it into the repository's Overview on Docker Hub when tags change. The images contain `\module\cm\content`, the same files as the zip. The [docker asset image creator](https://github.com/KayeeNL/sitecore-module-docker-asset-image-creator) isn't needed for 10.5: it converts Installation Wizard packages, and the 10.5 release is already plain files.
+
+**Versioning.** The version is `<Sitecore version>[.<module revision>]`:
+
+| Version | Meaning |
+| --- | --- |
+| `10.5.0` | First release for Sitecore 10.5.0 |
+| `10.5.0.1`, `10.5.0.2`, … | Module updates (fixes, features) for Sitecore 10.5.0 |
+| `10.5.1` | First release for Sitecore 10.5.1, if Sitecore ships one |
+
+NuGet sorts these correctly (`10.5.0` < `10.5.0.1` < `10.5.1`). The Docker tag `10.5-<base>` always points to the newest build for Sitecore 10.5. A module revision also gets an exact tag, such as `10.5.0.1-ltsc2025`. To release a module update:
+
+```
+git tag Sitecore_10.5.0.1
+git push origin Sitecore_10.5.0.1
+pwsh ./scripts/Build-Package.ps1 -Version 10.5.0.1 -DockerRepository nehemiah/sitecore-scheduled-publish
+```
+
+Then push the Docker tags the script lists.
 
 Pushing a `Sitecore_10.5*` tag runs `.github/workflows/release.yml`. That workflow builds the same artifacts, attaches them to a GitHub release, and publishes the NuGet package to nuget.org with [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing), so no API key is stored in the repo.
 
