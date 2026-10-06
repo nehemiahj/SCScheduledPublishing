@@ -77,14 +77,44 @@ Pick one of the following:
 - `/sitecore/system/Tasks/Schedules/ScheduledPublishTask` and `/sitecore/system/Modules/Scheduled Publish` exist.
 - `/sitecore/admin/showconfig.aspx` contains the `ZZ_ScheduledPublish` settings.
 
-**Upgrading an instance that had the module installed with the Installation Wizard** (non-IAR package): those items are in the database and take precedence over the IAR copies, so module updates from the `.dat` files would stay hidden. After deploying the 10.5 files, remove the database copies with:
+**Upgrading: do database copies of the module items need cleanup?**
 
-```
-dotnet sitecore itemres cleanup --what-if                                   # preview
-dotnet sitecore itemres cleanup -p "/sitecore/templates/Scheduled Publish" -r
-```
+With IAR, Sitecore reads the module's items from the `.dat` files. However, if an item with the same ID also exists in the database, **the database copy takes precedence**. Module changes shipped in the `.dat` files then stay hidden for that item.
 
-Run the second command for each root path in `ScheduledPublish.module.json`. Without `-p`, it cleans up every database item that has an IAR copy. Items whose fields differ from the IAR copy are skipped unless you add `--force`. Or delete the module items listed in `ScheduledPublish.module.json` from the master and core databases. Items created by editors under `/sitecore/system/Modules/Scheduled Publish/Publish Schedules` aren't part of the IAR files. Keep them.
+| Situation | Cleanup needed? |
+| --- | --- |
+| Fresh install | **No.** Nothing is in the database. |
+| Upgrade from an Installation Wizard package or a `ser push` install (10.2 / 10.3, or the non-IAR 10.4 / 10.4.1 packages) | **Yes.** All module items are in the database and override the new IAR items, including templates, ribbon and field types. |
+| Upgrade from a 10.4 / 10.4.1 **IAR** install | **Usually no.** Only items written at runtime are in the database (see below). Keep them. |
+
+Some database copies are expected and should be kept:
+- **`/sitecore/system/Tasks/Schedules/ScheduledPublishTask`**: Sitecore copies it to the database the first time the task runs (to save *Last run*), and does it again after every cleanup. The log shows `Default item ScheduledPublishTask (...) was migrated to head provider`.
+- **Settings an admin changed** under `/sitecore/system/Modules/Scheduled Publish`, such as email and section settings. Editing an IAR item saves a database copy that holds your values.
+- **Editors' schedules** under `/sitecore/system/Modules/Scheduled Publish/Publish Schedules`. These are normal database items, not part of the IAR files.
+
+To clean up after upgrading from a wizard or `ser push` install, use the Sitecore CLI (`dotnet sitecore login` to the CM first). `itemres cleanup` only removes database copies of items that also exist in IAR files:
+
+1. Preview what would be removed:
+   ```
+   dotnet sitecore itemres cleanup --what-if
+   ```
+2. Remove copies that are identical to the IAR version. Customized items, such as edited settings, are skipped:
+   ```
+   dotnet sitecore itemres cleanup
+   ```
+3. Force-remove only the module **definitions** that nobody edits by hand, so the new versions take effect. Preview each path with `--what-if` first:
+   ```
+   dotnet sitecore itemres cleanup -p "/sitecore/templates/Scheduled Publish" -r --force
+   ```
+   Do the same for the core-database definitions in `ScheduledPublish.module.json`:
+   - `/sitecore/content/Applications/Content Editor/Ribbons/Chunks/Scheduled Publish`
+   - `.../Ribbons/Strips/Publish/Scheduled Publish`
+   - `.../Gutters/Scheduled Publish`
+   - `/sitecore/system/Field types/Custom Field Types/Roles Multilist`
+
+   Or delete those core items by hand.
+
+**Never use `--force` on `/sitecore/system/Modules/Scheduled Publish`.** It would reset your email and section settings to the defaults.
 
 **Uninstall:** delete the six files listed above and recycle the app pool.
 
