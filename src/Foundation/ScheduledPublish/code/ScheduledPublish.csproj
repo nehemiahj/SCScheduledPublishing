@@ -5,7 +5,13 @@
 	<OutputType>Library</OutputType>
 	<StartupObject />
 	<Authors>Nehemiah Jeyakumar</Authors>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<!-- Version, company, copyright, product and description attributes are generated from these
+	     properties (Version comes from scripts/Build-Package.ps1); Properties/AssemblyInfo.cs keeps the rest. -->
+	<Company>Nehemiah Jeyakumar</Company>
+	<Product>Sitecore Scheduled Publish</Product>
+	<Copyright>Copyright © 2012-2015 Hedgehog Development, LLC. Modifications copyright © Nehemiah Jeyakumar. Licensed under Apache-2.0.</Copyright>
+	<AssemblyTitle>ScheduledPublish</AssemblyTitle>
+	<GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
   </PropertyGroup>
   <!-- NuGet package (dotnet pack). Run scripts/Build-Package.ps1 so the IAR .dat files exist before packing. -->
   <PropertyGroup>
