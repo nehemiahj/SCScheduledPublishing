@@ -1,6 +1,18 @@
-forked from [HedgehogDevelopment/SCScheduledPublishing](https://github.com/HedgehogDevelopment/SCScheduledPublishing).
+# Sitecore Scheduled Publish
 
-[Documentation](https://github.com/HedgehogDevelopment/SCScheduledPublishing/tree/master/Documentation) has been updated in the readme markdown.
+**Schedule publish and unpublish of Sitecore items for a future date and time, with email notifications.** An open-source module for the Sitecore Content Editor that supports **Sitecore XM and XP 10.2 – 10.5**, including Sitecore 10.5 with Package Designer disabled. The 10.5 release ships as Items as Resources (IAR) files, and is available as a NuGet package and as Docker images for Windows Server 2025 and 2022.
+
+[![Latest release](https://img.shields.io/github/v/release/nehemiahj/sitecore-scheduled-publish?label=release)](https://github.com/nehemiahj/sitecore-scheduled-publish/releases/latest)
+[![NuGet](https://img.shields.io/nuget/v/SCScheduledPublish?label=NuGet)](https://www.nuget.org/packages/SCScheduledPublish)
+[![Docker Hub](https://img.shields.io/docker/pulls/nehemiah/sitecore-scheduled-publish?label=Docker%20pulls)](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+
+| Get it | |
+| --- | --- |
+| **NuGet** | [`SCScheduledPublish`](https://www.nuget.org/packages/SCScheduledPublish): `dotnet add package SCScheduledPublish` |
+| **Docker** | [`nehemiah/sitecore-scheduled-publish`](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish): Sitecore module asset image (`10.5-ltsc2025`, `10.5-ltsc2022`) |
+| **Zip** | [GitHub releases](https://github.com/nehemiahj/sitecore-scheduled-publish/releases): unzip into the webroot, no Installation Wizard needed |
+| **Docs** | [Install on Sitecore 10.5](#sitecore-105) · [Upgrade notes](#sitecore-105) · [Configuration](#job-interval-configuration) |
 
 # Overview:
 
@@ -8,7 +20,7 @@ The purpose of Scheduled Publish is to give the content editor the option to del
 
 ## Source:
 
-- [Source](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/src/Foundation/ScheduledPublish) is updated to Sitecore 10.5.
+- [Source](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/src/Foundation/ScheduledPublish) is updated to Sitecore 10.5.
 - [Sitecore Content Serialization](https://doc.sitecore.com/xp/en/developers/102/developer-tools/sitecore-content-serialization.html) is used to serialize the content. Use Sitecore CLI to Push and Pull the content.
 
 ## Setup:
@@ -16,7 +28,7 @@ The purpose of Scheduled Publish is to give the content editor the option to del
 | Sitecore version | Install options |
 | --- | --- |
 | 10.5 | NuGet, file-drop IAR zip, Docker image, source + Sitecore CLI (see [Sitecore 10.5](#sitecore-105)) |
-| 10.2 – 10.4.1 | Sitecore package via Installation Wizard ([Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages)), Docker image, source |
+| 10.2 – 10.4.1 | Sitecore package via Installation Wizard ([Packages](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/Packages)), Docker image, source |
 
 ### Sitecore 10.5
 
@@ -42,7 +54,7 @@ Pick one of the following:
     ```
 
     The DLL is referenced as usual. The config, IAR and dialog files are added to the web project's publish output, at the paths listed above. Deploy the web project the way you normally do (Web Deploy, PaaS pipeline, or Docker build).
-2.  **File-drop zip**. Download `Sitecore Schedule Publish-10.5.0 IAR (files).zip` from [Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages) or the GitHub release, and extract it into the CM (and CD) webroot. On Azure PaaS, use Kudu / the zip deploy API. In a Docker image, add it to your CM Dockerfile:
+2.  **File-drop zip**. Download `Sitecore Schedule Publish-10.5.0 IAR (files).zip` from [Packages](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/Packages) or the GitHub release, and extract it into the CM (and CD) webroot. On Azure PaaS, use Kudu / the zip deploy API. In a Docker image, add it to your CM Dockerfile:
 
     ```dockerfile
     COPY ./scheduled-publish/ C:/inetpub/wwwroot/
@@ -120,7 +132,7 @@ To clean up after upgrading from a wizard or `ser push` install, use the Sitecor
 
 ### Sitecore 10.2 – 10.4.1
 
-1.  Install the package for your version from [Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages) with the Installation Wizard. From 10.3 onward, an IAR variant is available.
+1.  Install the package for your version from [Packages](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/Packages) with the Installation Wizard. From 10.3 onward, an IAR variant is available.
 2.  Clone source and add it in solution.
 3.  Use Docker Image from [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish).
     - `nehemiah/sitecore-scheduled-publish:10.4.1-ltsc2022` - v10.4.1 & IAR
@@ -270,3 +282,7 @@ This module utilizes a scheduled task in the master database to manage content p
 	<agent name="Master_Database_Agent" type="Sitecore.Tasks.DatabaseAgent" method="Run" interval="00:10:00" />
 </scheduling>
 ```
+
+## Credits
+
+Sitecore Scheduled Publish was originally created by [Hedgehog Development](https://github.com/HedgehogDevelopment/SCScheduledPublishing). That repository and its [original documentation](https://github.com/HedgehogDevelopment/SCScheduledPublishing/tree/master/Documentation) remain available. This repository is the actively maintained version, and adds Sitecore 10.x support, IAR packaging, NuGet, Docker images, and further enhancements. It's licensed under [Apache-2.0](LICENSE), and the original copyright notices are retained.

@@ -1,6 +1,6 @@
 # Sitecore Scheduled Publish – module asset image
 
-[Sitecore Scheduled Publish](https://github.com/nehemiahj/SCScheduledPublishing) lets content editors schedule a publish or unpublish of an item for a future date and time, with notifications. Pages or features can be prepared and previewed long before they go live, without the risk of an accidental early publish.
+[Sitecore Scheduled Publish](https://github.com/nehemiahj/sitecore-scheduled-publish) lets content editors schedule a publish or unpublish of an item for a future date and time, with notifications. Pages or features can be prepared and previewed long before they go live, without the risk of an accidental early publish.
 
 This is a **Sitecore module asset image**. You don't run it. You copy its files into your own Sitecore CM image when you build it.
 
@@ -57,7 +57,7 @@ From 10.4 onward, the module's items (templates, settings, the scheduled task, a
 - **Fresh install, or upgrade from a 10.4 / 10.4.1 IAR image:** no cleanup is needed.
 - **Upgrade from an Installation Wizard or `ser push` install:** run `dotnet sitecore itemres cleanup --what-if`, then `dotnet sitecore itemres cleanup`. Force-remove only the module definitions (templates, ribbon, field type).
 
-Keep the database copies of `ScheduledPublishTask`, which Sitecore recreates on every run, and of any module settings you customized. Never use `--force` on `/sitecore/system/Modules/Scheduled Publish`. See the [upgrade notes](https://github.com/nehemiahj/SCScheduledPublishing#sitecore-105).
+Keep the database copies of `ScheduledPublishTask`, which Sitecore recreates on every run, and of any module settings you customized. Never use `--force` on `/sitecore/system/Modules/Scheduled Publish`. See the [upgrade notes](https://github.com/nehemiahj/sitecore-scheduled-publish#sitecore-105).
 
 ## Verify
 
@@ -75,7 +75,7 @@ docker inspect nehemiah/sitecore-scheduled-publish:10.5-ltsc2022 --format "{{jso
 ## Other ways to install
 
 - **NuGet**: [`SCScheduledPublish`](https://www.nuget.org/packages/SCScheduledPublish)
-- **File-drop zip**: [GitHub releases](https://github.com/nehemiahj/SCScheduledPublishing/releases)
-- **Source and documentation**: [GitHub](https://github.com/nehemiahj/SCScheduledPublishing)
+- **File-drop zip**: [GitHub releases](https://github.com/nehemiahj/sitecore-scheduled-publish/releases)
+- **Source and documentation**: [GitHub](https://github.com/nehemiahj/sitecore-scheduled-publish)
 
 License: Apache-2.0

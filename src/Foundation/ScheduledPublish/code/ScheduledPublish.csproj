@@ -19,9 +19,9 @@
 	<Version>10.5.0</Version>
 	<Title>Sitecore Scheduled Publish</Title>
 	<Description>Schedule publish and unpublish of Sitecore items. Items ship as Items as Resources (IAR) files, so no Installation Wizard or Package Designer is required.</Description>
-	<PackageTags>Sitecore;Publishing;ScheduledPublish;IAR</PackageTags>
-	<PackageProjectUrl>https://github.com/nehemiahj/SCScheduledPublishing</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/nehemiahj/SCScheduledPublishing</RepositoryUrl>
+	<PackageTags>Sitecore;SitecoreModule;Sitecore10;SitecoreXM;SitecoreXP;Publishing;ScheduledPublish;ScheduledPublishing;Unpublish;IAR;ItemsAsResources</PackageTags>
+	<PackageProjectUrl>https://github.com/nehemiahj/sitecore-scheduled-publish</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/nehemiahj/sitecore-scheduled-publish</RepositoryUrl>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<IarOutputPath Condition="'$(IarOutputPath)' == ''">$(MSBuildThisFileDirectory)..\..\..\..\artifacts\iar\</IarOutputPath>
