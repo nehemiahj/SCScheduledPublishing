@@ -13,6 +13,7 @@
 | **Docker** | [`nehemiah/sitecore-scheduled-publish`](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish): Sitecore module asset image (`10.5-ltsc2025`, `10.5-ltsc2022`) |
 | **Zip** | [GitHub releases](https://github.com/nehemiahj/sitecore-scheduled-publish/releases): unzip into the webroot, no Installation Wizard needed |
 | **Docs** | [Install on Sitecore 10.5](#sitecore-105) · [Upgrade notes](#sitecore-105) · [Configuration](#job-interval-configuration) |
+| **Blog** | [Sitecore Scheduled Publish 10.5: shipping without Package Designer](https://www.nehemiahj.com/2026/10/sitecore-scheduled-publish-for-xmxp-105.html) (IAR, NuGet, Docker, upgrade cleanup) |
 
 # Overview:
 
@@ -46,6 +47,8 @@ After changing items, check that the module still loads from IAR on a clean inst
 | 10.2 – 10.4.1 | Sitecore package via Installation Wizard ([Packages](https://github.com/nehemiahj/sitecore-scheduled-publish/tree/main/Packages)), Docker image, source |
 
 ### Sitecore 10.5
+
+For the background and a walkthrough, see the blog post [Sitecore Scheduled Publish 10.5: Shipping Without Package Designer](https://www.nehemiahj.com/2026/10/sitecore-scheduled-publish-for-xmxp-105.html).
 
 Sitecore 10.5 disables Package Designer, and keeping it disabled is recommended. Starting with 10.5, Scheduled Publish ships **only** as an Items as Resources (IAR) build. All module items (templates, settings, task schedule, core ribbon/gutter/field types) are in `.dat` resource files, so the module installs as plain files. No Package Designer, Installation Wizard, or database writes are needed.
 

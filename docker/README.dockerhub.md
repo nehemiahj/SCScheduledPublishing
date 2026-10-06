@@ -79,5 +79,6 @@ docker inspect nehemiah/sitecore-scheduled-publish:10.5-ltsc2022 --format "{{jso
 - **NuGet**: [`SCScheduledPublish`](https://www.nuget.org/packages/SCScheduledPublish)
 - **File-drop zip**: [GitHub releases](https://github.com/nehemiahj/sitecore-scheduled-publish/releases)
 - **Source and documentation**: [GitHub](https://github.com/nehemiahj/sitecore-scheduled-publish)
+- **Release write-up**: [Sitecore Scheduled Publish 10.5: Shipping Without Package Designer](https://www.nehemiahj.com/2026/10/sitecore-scheduled-publish-for-xmxp-105.html)
 
 License: Apache-2.0
