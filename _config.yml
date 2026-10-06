@@ -1,9 +1,8 @@
-# GitHub Pages: publishes README.md as https://nehemiahj.github.io/sitecore-scheduled-publish/
+# GitHub Pages: index.md (which includes README.md) is published as https://nehemiahj.github.io/sitecore-scheduled-publish/
 title: Sitecore Scheduled Publish
 description: >-
-  Open-source Sitecore module to schedule publish and unpublish of items for a future date and time,
-  with notifications. Supports Sitecore XM/XP 10.2 - 10.5 (IAR, Package Designer not required),
-  NuGet package and Docker images for Windows Server 2025 and 2022.
+  Open-source Sitecore module to schedule publish and unpublish of items, with notifications.
+  Sitecore XM/XP 10.2-10.5, IAR, NuGet and Docker.
 url: https://nehemiahj.github.io
 baseurl: /sitecore-scheduled-publish
 lang: en
@@ -15,6 +14,7 @@ plugins:
 github:
   is_project_page: true
 exclude:
+  - README.md
   - src
   - Packages
   - scripts
