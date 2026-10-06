@@ -58,7 +58,25 @@ jobs:
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         shell: pwsh
+        # Rerunnable: if the release already exists (e.g. the tag was moved and pushed again), replace its
+        # assets instead of failing. Deleting a tag turns its release into a draft, so publish it again.
         run: |
+          $tag = "${{ github.ref_name }}"
           $files = Get-ChildItem artifacts -File | ForEach-Object FullName
-          gh release create "${{ github.ref_name }}" @files --title "Sitecore Scheduled Publish ${{ steps.version.outputs.value }}" --generate-notes
+
+          $existing = gh release view $tag --json isDraft 2>$null | ConvertFrom-Json
+          if ($LASTEXITCODE -eq 0 -and $existing) {
+            Write-Host "Release $tag exists; replacing assets."
+            gh release upload $tag @files --clobber
+            if ($LASTEXITCODE -ne 0) { throw "gh release upload failed" }
+            if ($existing.isDraft) {
+              gh release edit $tag --draft=false
+              if ($LASTEXITCODE -ne 0) { throw "gh release edit failed" }
+            }
+          }
+          else {
+            gh release create $tag @files --title "Sitecore Scheduled Publish ${{ steps.version.outputs.value }}" --generate-notes
+            if ($LASTEXITCODE -ne 0) { throw "gh release create failed" }
+          }
