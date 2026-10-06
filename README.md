@@ -8,12 +8,71 @@ The purpose of Scheduled Publish is to give the content editor the option to del
 
 ## Source:
 
-- [Source](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/src/Foundation/ScheduledPublish) is updated to Sitecore 10.4.
+- [Source](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/src/Foundation/ScheduledPublish) is updated to Sitecore 10.5.
 - [Sitecore Content Serialization](https://doc.sitecore.com/xp/en/developers/102/developer-tools/sitecore-content-serialization.html) is used to serialize the content. Use Sitecore CLI to Push and Pull the content.
 
 ## Setup:
 
-1.  Package is compatible for Sitecore v10+. [Download Package](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages).
+| Sitecore version | Install options |
+| --- | --- |
+| 10.5 | NuGet, file-drop IAR zip, Docker image, source + Sitecore CLI (see [Sitecore 10.5](#sitecore-105)) |
+| 10.2 – 10.4.1 | Sitecore package via Installation Wizard ([Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages)), Docker image, source |
+
+### Sitecore 10.5
+
+Sitecore 10.5 disables Package Designer, and keeping it disabled is recommended. Starting with 10.5, Scheduled Publish ships **only** as an Items as Resources (IAR) build. All module items (templates, settings, task schedule, core ribbon/gutter/field types) are in `.dat` resource files, so the module installs as plain files. No Package Designer, Installation Wizard, or database writes are needed.
+
+The module consists of these files:
+
+```
+bin/ScheduledPublish.dll
+App_Config/Include/ZZ_ScheduledPublish/ZZ_ScheduledPublishControl.config
+App_Data/items/master/items.master.schedule.publish.dat
+App_Data/items/core/items.core.schedule.publish.dat
+sitecore/shell/Applications/Content Manager/Dialogs/Schedule Publish/Schedule Publish.xml
+sitecore/shell/Applications/Content Manager/Dialogs/Edit Scheduled Publish/Edit Scheduled Publish.xml
+```
+
+Pick one of the following:
+
+1.  **NuGet** (recommended for solutions with a CI/CD pipeline). Add the package to your Sitecore web project:
+
+    ```
+    dotnet add package SCScheduledPublish --version 10.5.0
+    ```
+
+    The DLL is referenced as usual. The config, IAR and dialog files are added to the web project's publish output, at the paths listed above. Deploy the web project the way you normally do (Web Deploy, PaaS pipeline, or Docker build).
+2.  **File-drop zip**. Download `Sitecore Schedule Publish-10.5.0 IAR (files).zip` from [Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages) or the GitHub release, and extract it into the CM (and CD) webroot. On Azure PaaS, use Kudu / the zip deploy API. In a Docker image, add it to your CM Dockerfile:
+
+    ```dockerfile
+    COPY ./scheduled-publish/ C:/inetpub/wwwroot/
+    ```
+
+    Recycle the app pool (or restart the container) afterwards.
+3.  **Docker image**: `nehemiah/sitecore-scheduled-publish:<10.5 tag>`. *Details to follow.*
+4.  **From source**. Clone the repo and add the project to your solution. Deploy the files, then either:
+    - push the items to the database with the Sitecore CLI: `dotnet sitecore ser push -i ScheduledPublish`, or
+    - generate the IAR files: `dotnet sitecore itemres create -i ScheduledPublish -o <webroot>/App_Data/items/schedule.publish`, then move each `items.<db>.schedule.publish.dat` into `App_Data/items/<db>/`.
+
+**Verify the install:**
+- The Content Editor **Publish** ribbon shows the **Scheduled Publish** strip.
+- `/sitecore/system/Tasks/Schedules/ScheduledPublishTask` and `/sitecore/system/Modules/Scheduled Publish` exist.
+- `/sitecore/admin/showconfig.aspx` contains the `ZZ_ScheduledPublish` settings.
+
+**Upgrading an instance that had the module installed with the Installation Wizard** (non-IAR package): those items are in the database and take precedence over the IAR copies, so module updates from the `.dat` files would stay hidden. After deploying the 10.5 files, remove the database copies with:
+
+```
+dotnet sitecore itemres cleanup --what-if                                   # preview
+dotnet sitecore itemres cleanup -p "/sitecore/templates/Scheduled Publish" -r
+```
+
+Run the second command for each root path in `ScheduledPublish.module.json`. Without `-p`, it cleans up every database item that has an IAR copy. Items whose fields differ from the IAR copy are skipped unless you add `--force`. Or delete the module items listed in `ScheduledPublish.module.json` from the master and core databases. Items created by editors under `/sitecore/system/Modules/Scheduled Publish/Publish Schedules` aren't part of the IAR files. Keep them.
+
+**Uninstall:** delete the six files listed above and recycle the app pool.
+
+### Sitecore 10.2 – 10.4.1
+
+1.  Install the package for your version from [Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages) with the Installation Wizard. From 10.3 onward, an IAR variant is available.
 2.  Clone source and add it in solution.
 3.  Use Docker Image from [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish).
     - `nehemiah/sitecore-scheduled-publish:latest` - v10.4 & IAR
@@ -21,6 +80,16 @@ The purpose of Scheduled Publish is to give the content editor the option to del
     - `nehemiah/sitecore-scheduled-publish:10.3-1809` - v10.3
     - `nehemiah/sitecore-scheduled-publish:10.2-1809` - v10.2
     - more...
+
+### Building the release (maintainers)
+
+```
+pwsh ./scripts/Build-Package.ps1 -Version 10.5.0
+```
+
+The script generates the IAR files with `dotnet sitecore itemres create`, builds the DLL, and writes the file-drop zip and the `.nupkg` to `artifacts/`. It also copies the zip to `Packages/`. Package Designer isn't used.
+
+Pushing a `Sitecore_10.5*` tag runs `.github/workflows/release.yml`. That workflow builds the same artifacts, attaches them to a GitHub release, and publishes the NuGet package to nuget.org with [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing), so no API key is stored in the repo.
 
 ## Features:
 

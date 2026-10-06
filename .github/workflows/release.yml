@@ -1,0 +1,58 @@
+name: Release
+
+# Builds the IAR file-drop zip and the NuGet package, attaches both to a GitHub release,
+# and publishes the NuGet package to nuget.org with Trusted Publishing (OIDC, no stored API key).
+on:
+  push:
+    tags:
+      - "Sitecore_10.5*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Package version (e.g. 10.5.0)"
+        required: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+    environment: nuget
+    permissions:
+      contents: write   # create the GitHub release
+      id-token: write   # OIDC token for NuGet Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          $version = if ("${{ github.event_name }}" -eq "workflow_dispatch") { "${{ inputs.version }}" } else { "${{ github.ref_name }}" -replace '^Sitecore_', '' }
+          if ($version -notmatch '^\d+\.\d+(\.\d+)?') { throw "Unexpected version '$version'" }
+          "value=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Build package
+        shell: pwsh
+        run: ./scripts/Build-Package.ps1 -Version ${{ steps.version.outputs.value }}
+
+      - name: NuGet login (Trusted Publishing)
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to nuget.org
+        shell: pwsh
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: GitHub release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem artifacts -File | ForEach-Object FullName
+          gh release create "${{ github.ref_name }}" @files --title "Sitecore Scheduled Publish ${{ steps.version.outputs.value }}" --generate-notes

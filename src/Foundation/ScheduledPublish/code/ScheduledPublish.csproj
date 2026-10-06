@@ -1,14 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
 	<ApplicationIcon />
 	<OutputType>Library</OutputType>
 	<StartupObject />
 	<Authors>Nehemiah Jeyakumar</Authors>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup> 
+  </PropertyGroup>
+  <!-- NuGet package (dotnet pack). Run scripts/Build-Package.ps1 so the IAR .dat files exist before packing. -->
+  <PropertyGroup>
+	<PackageId>SCScheduledPublish</PackageId>
+	<Version>10.5.0</Version>
+	<Title>Sitecore Scheduled Publish</Title>
+	<Description>Schedule publish and unpublish of Sitecore items. Items ship as Items as Resources (IAR) files, so no Installation Wizard or Package Designer is required.</Description>
+	<PackageTags>Sitecore;Publishing;ScheduledPublish;IAR</PackageTags>
+	<PackageProjectUrl>https://github.com/nehemiahj/SCScheduledPublishing</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/nehemiahj/SCScheduledPublishing</RepositoryUrl>
+	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<IarOutputPath Condition="'$(IarOutputPath)' == ''">$(MSBuildThisFileDirectory)..\..\..\..\artifacts\iar\</IarOutputPath>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Sitecore.Kernel" Version="10.4.1" />
+    <PackageReference Include="Sitecore.Kernel" Version="10.5.0" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="sysglobl" />
@@ -44,6 +57,19 @@
     <Content Include="sitecore\shell\Applications\Content Manager\Dialogs\Schedule Publish\Schedule Publish.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ScheduledPublish.module.json" />
+    <Content Include="ScheduledPublish.module.json" Pack="false" />
   </ItemGroup>
+  <!-- Webroot files go under content\ (packages.config copies them into the project). PackageReference
+       consumers get them through build\SCScheduledPublish.targets as linked Content items. -->
+  <ItemGroup>
+    <Content Update="App_Config\**;sitecore\**" Pack="true" PackagePath="content\%(RelativeDir)" />
+    <None Include="$(IarOutputPath)items.master.schedule.publish.dat" Pack="true" PackagePath="content\App_Data\items\master\" />
+    <None Include="$(IarOutputPath)items.core.schedule.publish.dat" Pack="true" PackagePath="content\App_Data\items\core\" />
+    <None Update="nuget\SCScheduledPublish.targets" Pack="true" PackagePath="build\SCScheduledPublish.targets" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <Target Name="EnsureIarFiles" BeforeTargets="GenerateNuspec">
+    <Error Condition="!Exists('$(IarOutputPath)items.master.schedule.publish.dat') Or !Exists('$(IarOutputPath)items.core.schedule.publish.dat')"
+           Text="IAR files not found in $(IarOutputPath). Run scripts/Build-Package.ps1 (or dotnet sitecore itemres create) first." />
+  </Target>
 </Project>
