@@ -11,3 +11,10 @@ build/
 [Bb]in/
 [Oo]bj/
 
+
+# Release artifacts (scripts/Build-Package.ps1)
+artifacts/
+
+# Sitecore CLI local state
+.sitecore/
+*.scindex

@@ -1,0 +1,14 @@
+<Project>
+  <!--
+    PackageReference projects don't receive content\ files from a package. Add them as linked Content
+    items so web publish (and Sitecore Docker/PaaS deployments built from it) puts them in the webroot.
+    packages.config projects already get the files copied into the project, so they are skipped here.
+  -->
+  <ItemGroup Condition="'$(NuGetProjectStyle)' == 'PackageReference'">
+    <Content Include="$(MSBuildThisFileDirectory)..\content\**\*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+</Project>
