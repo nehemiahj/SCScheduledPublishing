@@ -52,6 +52,7 @@ Pick one of the following:
 3.  **Docker image**. A Sitecore module asset image (CM only) is available on [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish):
     - `nehemiah/sitecore-scheduled-publish:10.5-ltsc2022`: Windows Server 2022 base
     - `nehemiah/sitecore-scheduled-publish:10.5-1809`: Windows Server 2019 base
+    - `nehemiah/sitecore-scheduled-publish:latest`: same as `10.5-ltsc2022`
 
     The image contains the module files under `\module\cm\content`. Copy them into your CM image:
 
@@ -90,7 +91,6 @@ Run the second command for each root path in `ScheduledPublish.module.json`. Wit
 1.  Install the package for your version from [Packages](https://github.com/nehemiahj/SCScheduledPublishing/tree/master/Packages) with the Installation Wizard. From 10.3 onward, an IAR variant is available.
 2.  Clone source and add it in solution.
 3.  Use Docker Image from [Docker Hub](https://hub.docker.com/r/nehemiah/sitecore-scheduled-publish).
-    - `nehemiah/sitecore-scheduled-publish:latest` - v10.4 & IAR
     - `nehemiah/sitecore-scheduled-publish:10.4-1809` - v10.4 & IAR
     - `nehemiah/sitecore-scheduled-publish:10.3-1809` - v10.3
     - `nehemiah/sitecore-scheduled-publish:10.2-1809` - v10.2
