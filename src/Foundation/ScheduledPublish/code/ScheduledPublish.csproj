@@ -18,7 +18,7 @@
 	<PackageId>SCScheduledPublish</PackageId>
 	<Version>10.5.0</Version>
 	<Title>Sitecore Scheduled Publish</Title>
-	<Description>Schedule publish and unpublish of Sitecore items. Items ship as Items as Resources (IAR) files, so no Installation Wizard or Package Designer is required.</Description>
+	<Description>Sitecore Scheduled Publish: schedule publish and unpublish of Sitecore items for a future date and time, with email notifications. For Sitecore XM/XP 10.5. Items ship as Items as Resources (IAR) files, so no Installation Wizard, Package Designer or database step is required.</Description>
 	<PackageTags>Sitecore;SitecoreModule;Sitecore10;SitecoreXM;SitecoreXP;Publishing;ScheduledPublish;ScheduledPublishing;Unpublish;IAR;ItemsAsResources</PackageTags>
 	<PackageProjectUrl>https://github.com/nehemiahj/sitecore-scheduled-publish</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/nehemiahj/sitecore-scheduled-publish</RepositoryUrl>
